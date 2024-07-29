@@ -408,10 +408,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3862b026c0beb9b4e93ae739d9707790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GLBNAMES:
-  - https://mart-wishee.s3.ap-south-1.amazonaws.com/9be34fa7-3213-4679-ba4a-5ccffe5cf073/output.glb
-  - https://mart-wishee.s3.ap-south-1.amazonaws.com/d2b68ac2-82ff-4bea-adbd-5dca8742bffa/output.glb
   Downloader: {fileID: 1890481760}
+  DataURL: https://mart.wishee.workers.dev/products
 --- !u!4 &1890481759
 Transform:
   m_ObjectHideFlags: 0

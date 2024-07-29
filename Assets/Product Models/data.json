@@ -1,0 +1,24 @@
+{
+  "DATA": {
+    "food": [
+      {
+        "ID": "9be34fa7-3213-4679-ba4a-5ccffe5cf073",
+        "Name": "fff",
+        "Description": "BALLS PRODUCT",
+        "Stock": 100,
+        "Price": 99.99,
+        "Manufacturer": "Example Manufacturer",
+        "Type": null
+      },
+      {
+        "ID": "d2b68ac2-82ff-4bea-adbd-5dca8742bffa",
+        "Name": "Lamp",
+        "Description": "Light up your life",
+        "Stock": 100,
+        "Price": 99.99,
+        "Manufacturer": "ikea",
+        "Type": null
+      }
+    ]
+  }
+}

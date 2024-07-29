@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,106 +10,164 @@ using UnityEngine.Networking;
 
 public class ModelImporter : MonoBehaviour
 {
-    //public List<string> GLBNAMES;
     public FileDownloader Downloader;
     public string DataURL;
+    private Catelog productTypes = new Catelog();
+    private LocalTableData LocalData;
 
-    public IEnumerator Start()
+    private void Awake()
     {
         Downloader = GetComponent<FileDownloader>();
-        ProductList productList = new ProductList();
-        Catelog productTypes = new Catelog();
-        
-        
-        using (UnityWebRequest GetCatelog = UnityWebRequest.Get(DataURL))
+    }
+
+    private IEnumerator Start()
+    { 
+        LoadLocalData();
+        yield return StartCoroutine(FetchCategories());
+        foreach (var products in LocalData.DATA)
         {
-            yield return GetCatelog.SendWebRequest();
+            print(products.Key);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            DownloadCategory("food");
+        }
+    }
+
+    private void LoadLocalData()
+    {
+        if (!Directory.Exists(Path.Combine(Application.dataPath, "Product Models")))
+        {
+            Directory.CreateDirectory(Path.Combine(Application.dataPath, "Product Models"));
+        }
+        string dataPath = Path.Combine(Application.dataPath, "Product Models", "data.json");
+        if (File.Exists(dataPath))
+        {
+            string json = File.ReadAllText(dataPath);
+            LocalData = JsonConvert.DeserializeObject<LocalTableData>(json);
+            print("Loaded Data file");
+        }
+        else
+        {
+            LocalData = new LocalTableData();
+            print("Creating new Data Object");
+        }
+    }
+
+    private IEnumerator FetchCategories()
+    {
+        using (UnityWebRequest getCatalog = UnityWebRequest.Get(DataURL))
+        {
+            yield return getCatalog.SendWebRequest();
             
-            if (GetCatelog.result == UnityWebRequest.Result.ConnectionError ||
-                GetCatelog.result == UnityWebRequest.Result.ProtocolError)
+            if (getCatalog.result == UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Failed To retrieve Catelog");
+                string types = getCatalog.downloadHandler.text;
+                productTypes = JsonConvert.DeserializeObject<Catelog>(types);
+                if (productTypes.categories != null)
+                {
+                    foreach (var productType in productTypes.categories)
+                    {
+                        LocalData.AddCategory(productType);
+                    }
+                    SaveLocalData();
+                }
             }
             else
             {
-                string CateJson = GetCatelog.downloadHandler.text;
-                productList = JsonConvert.DeserializeObject<ProductList>(CateJson);
-                if (productList.products == null)
-                {
-                    print("Failed to Get Data");
-                    yield break;
-                }
+                Debug.LogError("Failed to retrieve Catalog: " + getCatalog.error);
             }
         }
+    }
 
-        foreach (var Product in productList.products)
+    public void DownloadCategory(string category)
+    {
+        if (!LocalData.IsCategoryDownloaded(category))
         {
-            yield return StartCoroutine(Downloader.DownloadFile(Product.meshURL,"Model_"+Product._id+".glb","test"));
-            print($"Downloaded Model {Product._id}!");
+            StartCoroutine(GetCategoryData(category));
         }
-        
-        print("All Models Retrieved");
-
-        // for (int i = 0; i < GLBNAMES.Count; i++)
-        // {
-        //     yield return ImportSingleGLB(Path.Combine(Path.Combine(Application.dataPath,"test"),"Model_"+i+".glb"));
-        // }
-
-        foreach (var product in productList.products)
+        else
         {
-            yield return ImportSingleGLB(Path.Combine(Path.Combine(Application.dataPath,"test"),"Model_"+product._id+".glb"));
+            Debug.Log($"Category {category} is already downloaded.");
         }
-        
-        yield return null;
+    }
 
+    private IEnumerator GetCategoryData(string productType)
+    {
+        using (UnityWebRequest productRequest = UnityWebRequest.Get(DataURL + $"/{productType}"))
+        {
+            yield return productRequest.SendWebRequest();
+                            
+            if (productRequest.result == UnityWebRequest.Result.Success)
+            {
+                string cateJson = productRequest.downloadHandler.text;
+                var productList = JsonConvert.DeserializeObject<ProductList>(cateJson);
+                if (productList.products != null)
+                {
+                    foreach (var product in productList.products)
+                    {
+                        yield return StartCoroutine(Downloader.DownloadFile(product.meshURL, $"Model_{product._id}.glb", productType));
+                        if (File.Exists(Path.Combine(Application.dataPath, "Product Models", productType, $"Model_{product._id}.glb")))
+                        {
+                            LocalData.AddProduct(product);
+                        }
+                        Debug.Log($"Downloaded Model {product._id}!");
+                    }
+        
+                    Debug.Log($"All Models of type {productType} Retrieved");
+                    SaveLocalData();
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed To retrieve Catalog for type: {productType}. Error: {productRequest.error}");
+            }
+        }
+    }
 
-        
-        
+    private void SaveLocalData()
+    {
+        string json = JsonConvert.SerializeObject(LocalData, Formatting.Indented);
+        File.WriteAllText(Path.Combine(Application.dataPath, "Product Models", "data.json"), json);
+        print("Saved Data locally");
     }
 
     async Task ImportGLB(string path)
-    {
-        var gltf = new GltfImport();
-        print(path);
-        var success = await gltf.Load(path);
-
-        if (success)
-        {
-            await gltf.InstantiateMainSceneAsync(transform);
-            print("Model Loaded Successfully");
-        }
-        else
-        {
-            Debug.LogError("Failed to load GLB file.");
-        }
-    }
-    private IEnumerator ImportSingleGLB(string path)
-    {
-        Task importTask = ImportGLB(path);
-        
-        while (!importTask.IsCompleted)
-        {
-            yield return null;
-        }
-
-        if (importTask.IsFaulted)
-        {
-            Debug.LogError($"Error importing {path}: {importTask.Exception}");
-        }
-        else
-        {
-            Debug.Log($"Successfully imported {path}");
-        }
-    }
-
-    // private IEnumerator GetModels(List<string> url_list)
-    // {
-    //     int i = 0;
-    //     foreach (var url in url_list)
-    //     {
-    //         yield return StartCoroutine(Downloader.DownloadFile(url,"Model_"+i+".glb","test"));
-    //         print("Downloaded Model!");
-    //         i++;
-    //     }
-    // }
+         {
+             var gltf = new GltfImport();
+             print(path);
+             var success = await gltf.Load(path);
+     
+             if (success)
+             {
+                 await gltf.InstantiateMainSceneAsync(transform);
+                 print("Model Loaded Successfully");
+             }
+             else
+             {
+                 Debug.LogError("Failed to load GLB file.");
+             }
+         }
+         private IEnumerator ImportSingleGLB(string path)
+         {
+             Task importTask = ImportGLB(path);
+             
+             while (!importTask.IsCompleted)
+             {
+                 yield return null;
+             }
+     
+             if (importTask.IsFaulted)
+             {
+                 Debug.LogError($"Error importing {path}: {importTask.Exception}");
+             }
+             else
+             {
+                 Debug.Log($"Successfully imported {path}");
+             }
+         }
 }

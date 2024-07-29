@@ -9,10 +9,11 @@ public class FileDownloader : MonoBehaviour
 
     public IEnumerator DownloadFile(string FileURL, string FileName, string type)
     {
-        string filePath = Path.Combine(Path.Combine(Application.dataPath, type), FileName);
-
+        //string filePath = Path.Combine(Path.Combine(Application.dataPath, type), FileName);
+        string filePath = Path.Combine(Path.Combine(Path.Combine(Application.dataPath, "Product Models"), type),FileName);
+        
         // Create directory if it doesn't exist
-        Directory.CreateDirectory(Path.Combine(Application.dataPath, type));
+        Directory.CreateDirectory(Path.Combine(Path.Combine(Application.dataPath, "Product Models"),type));
 
         if (File.Exists(filePath))
         {
