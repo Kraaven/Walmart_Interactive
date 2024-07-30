@@ -18,10 +18,11 @@ public class ProductInfo
     public string manufacturer;
     public string meshURL;
     public int stock;
+    public string category;
     public string createdAt;
     public string updatedAt;
     public List<string> images;
-    public string Type;
+    
 }
 
 public class Catelog
@@ -49,20 +50,15 @@ public class LocalTableData
         piece.Stock = info.stock;
         piece.Price = info.price;
         piece.Manufacturer = info.manufacturer;
-        if (info.Type == null)
-        {
-            info.Type = "food";
-        }
-        piece.Type = info.Type;
-
+        piece.Type = info.category;
         
-
-        if (!DATA.ContainsKey(info.Type))
+        if (!DATA.ContainsKey(info.category))
         {
-            DATA.Add(info.Type,new List<ProductDisplay>());
+            DATA.Add(info.category,new List<ProductDisplay>());
         }
         
-        DATA[info.Type].Add(piece);
+        
+        DATA[info.category].Add(piece);
 
     }
 

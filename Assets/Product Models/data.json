@@ -1,24 +1,281 @@
 {
   "DATA": {
-    "food": [
+    "food": [],
+    "furniture": [
       {
-        "ID": "9be34fa7-3213-4679-ba4a-5ccffe5cf073",
-        "Name": "fff",
-        "Description": "BALLS PRODUCT",
-        "Stock": 100,
-        "Price": 99.99,
-        "Manufacturer": "Example Manufacturer",
-        "Type": null
+        "ID": "18c504c9-f576-4d43-bac3-08c26335cb39",
+        "Name": "Modern Sofa 1",
+        "Description": "Comfortable and stylish modern sofa.",
+        "Stock": 79,
+        "Price": 3.24,
+        "Manufacturer": "Manufacturer 1",
+        "Type": "furniture"
       },
       {
-        "ID": "d2b68ac2-82ff-4bea-adbd-5dca8742bffa",
-        "Name": "Lamp",
-        "Description": "Light up your life",
-        "Stock": 100,
-        "Price": 99.99,
-        "Manufacturer": "ikea",
-        "Type": null
+        "ID": "6be54824-4e2c-4631-a6db-1c9d21b04129",
+        "Name": "Dining Table Set 2",
+        "Description": "Elegant dining table set for your home.",
+        "Stock": 195,
+        "Price": 44.53,
+        "Manufacturer": "Manufacturer 2",
+        "Type": "furniture"
+      },
+      {
+        "ID": "ec20cdae-aaa6-489d-a8ed-7febcc20f951",
+        "Name": "Office Chair 3",
+        "Description": "Ergonomic office chair for better posture.",
+        "Stock": 147,
+        "Price": 1.75,
+        "Manufacturer": "Manufacturer 3",
+        "Type": "furniture"
+      },
+      {
+        "ID": "9af0b429-1af1-4e10-99dc-e6fd78746393",
+        "Name": "Office Chair 4",
+        "Description": "Ergonomic office chair for better posture.",
+        "Stock": 151,
+        "Price": 79.85,
+        "Manufacturer": "Manufacturer 4",
+        "Type": "furniture"
+      },
+      {
+        "ID": "3328c086-3786-49ae-8611-fe4f232e4ccd",
+        "Name": "Modern Sofa 5",
+        "Description": "Comfortable and stylish modern sofa.",
+        "Stock": 189,
+        "Price": 86.02,
+        "Manufacturer": "Manufacturer 5",
+        "Type": "furniture"
+      },
+      {
+        "ID": "fdecf17a-7809-4224-be13-ceed2ce43092",
+        "Name": "Bookshelf 6",
+        "Description": "Sturdy and spacious bookshelf.",
+        "Stock": 156,
+        "Price": 62.76,
+        "Manufacturer": "Manufacturer 6",
+        "Type": "furniture"
+      },
+      {
+        "ID": "c6ca8fc3-4df2-4c38-9de9-1ec003557dd3",
+        "Name": "Dining Table Set 7",
+        "Description": "Elegant dining table set for your home.",
+        "Stock": 165,
+        "Price": 67.24,
+        "Manufacturer": "Manufacturer 7",
+        "Type": "furniture"
+      },
+      {
+        "ID": "1d12c6fc-2e85-4dc0-ae65-036b175f645d",
+        "Name": "Dining Table Set 8",
+        "Description": "Elegant dining table set for your home.",
+        "Stock": 16,
+        "Price": 20.08,
+        "Manufacturer": "Manufacturer 8",
+        "Type": "furniture"
+      },
+      {
+        "ID": "877665a5-1e29-4460-921c-f0b2c7acd144",
+        "Name": "Bookshelf 9",
+        "Description": "Sturdy and spacious bookshelf.",
+        "Stock": 186,
+        "Price": 73.22,
+        "Manufacturer": "Manufacturer 9",
+        "Type": "furniture"
+      },
+      {
+        "ID": "1e172e32-ac5f-4330-9824-1683831e6505",
+        "Name": "Bed Frame 10",
+        "Description": "Solid wood bed frame with a sleek design.",
+        "Stock": 79,
+        "Price": 99.42,
+        "Manufacturer": "Manufacturer 10",
+        "Type": "furniture"
+      },
+      {
+        "ID": "91b80739-14a5-4495-913c-3d1eb7a2412a",
+        "Name": "Bookshelf 11",
+        "Description": "Sturdy and spacious bookshelf.",
+        "Stock": 45,
+        "Price": 90.47,
+        "Manufacturer": "Manufacturer 11",
+        "Type": "furniture"
+      },
+      {
+        "ID": "7f387d27-b9b1-4b6f-a8f5-1dae85630fec",
+        "Name": "Dining Table Set 12",
+        "Description": "Elegant dining table set for your home.",
+        "Stock": 67,
+        "Price": 36.11,
+        "Manufacturer": "Manufacturer 12",
+        "Type": "furniture"
+      },
+      {
+        "ID": "04b058a8-8415-4ba2-a59a-639f2a10a4c0",
+        "Name": "Dining Table Set 13",
+        "Description": "Elegant dining table set for your home.",
+        "Stock": 191,
+        "Price": 16.31,
+        "Manufacturer": "Manufacturer 13",
+        "Type": "furniture"
+      },
+      {
+        "ID": "06849b83-37cd-43ae-b76f-057f584eb7c6",
+        "Name": "Bed Frame 14",
+        "Description": "Solid wood bed frame with a sleek design.",
+        "Stock": 88,
+        "Price": 11.78,
+        "Manufacturer": "Manufacturer 14",
+        "Type": "furniture"
+      },
+      {
+        "ID": "8f46e518-703d-4705-88a9-475d3ed78975",
+        "Name": "Bed Frame 15",
+        "Description": "Solid wood bed frame with a sleek design.",
+        "Stock": 102,
+        "Price": 46.62,
+        "Manufacturer": "Manufacturer 15",
+        "Type": "furniture"
       }
-    ]
+    ],
+    "electronics": [],
+    "clothing": [
+      {
+        "ID": "d64f774c-f6d5-40c8-b5dd-6f2455298a68",
+        "Name": "Jeans 1",
+        "Description": "Stylish and durable jeans.",
+        "Stock": 193,
+        "Price": 95.26,
+        "Manufacturer": "Manufacturer 1",
+        "Type": "clothing"
+      },
+      {
+        "ID": "918bcd11-95cc-491e-afda-f8f53d2b039c",
+        "Name": "T-Shirt 2",
+        "Description": "Comfortable and casual t-shirt for everyday wear.",
+        "Stock": 10,
+        "Price": 77.41,
+        "Manufacturer": "Manufacturer 2",
+        "Type": "clothing"
+      },
+      {
+        "ID": "b9fdae82-ea1c-4e74-9f26-7b2da7bd30f9",
+        "Name": "Sneakers 3",
+        "Description": "Trendy and comfortable sneakers.",
+        "Stock": 121,
+        "Price": 67.15,
+        "Manufacturer": "Manufacturer 3",
+        "Type": "clothing"
+      },
+      {
+        "ID": "764477d2-e622-4e62-bce0-bc3f02b378a1",
+        "Name": "Sneakers 4",
+        "Description": "Trendy and comfortable sneakers.",
+        "Stock": 112,
+        "Price": 76.31,
+        "Manufacturer": "Manufacturer 4",
+        "Type": "clothing"
+      },
+      {
+        "ID": "45d11e5f-751b-467e-8fc6-bb6796d56a0a",
+        "Name": "Jacket 5",
+        "Description": "Warm and cozy jacket for the colder months.",
+        "Stock": 146,
+        "Price": 33.26,
+        "Manufacturer": "Manufacturer 5",
+        "Type": "clothing"
+      },
+      {
+        "ID": "cd4b03d8-0229-4768-83cf-7e2682d14b21",
+        "Name": "Jacket 6",
+        "Description": "Warm and cozy jacket for the colder months.",
+        "Stock": 90,
+        "Price": 70.85,
+        "Manufacturer": "Manufacturer 6",
+        "Type": "clothing"
+      },
+      {
+        "ID": "7f86a9c0-c43d-45be-b22b-b66fa9033649",
+        "Name": "Jacket 7",
+        "Description": "Warm and cozy jacket for the colder months.",
+        "Stock": 4,
+        "Price": 49.76,
+        "Manufacturer": "Manufacturer 7",
+        "Type": "clothing"
+      },
+      {
+        "ID": "f2cfdecf-c5db-44c8-b1ca-e3c491860b95",
+        "Name": "Dress 8",
+        "Description": "Elegant dress for special occasions.",
+        "Stock": 191,
+        "Price": 1.9,
+        "Manufacturer": "Manufacturer 8",
+        "Type": "clothing"
+      },
+      {
+        "ID": "ef985832-4835-4721-9c92-c99443ba9551",
+        "Name": "Sneakers 9",
+        "Description": "Trendy and comfortable sneakers.",
+        "Stock": 166,
+        "Price": 88.2,
+        "Manufacturer": "Manufacturer 9",
+        "Type": "clothing"
+      },
+      {
+        "ID": "70ba92dc-7c30-47eb-b819-4f8b2561d5ad",
+        "Name": "Jeans 10",
+        "Description": "Stylish and durable jeans.",
+        "Stock": 37,
+        "Price": 83.25,
+        "Manufacturer": "Manufacturer 10",
+        "Type": "clothing"
+      },
+      {
+        "ID": "1a5090d5-16c5-4984-9a10-ba6cb20493fc",
+        "Name": "Jeans 11",
+        "Description": "Stylish and durable jeans.",
+        "Stock": 70,
+        "Price": 83.39,
+        "Manufacturer": "Manufacturer 11",
+        "Type": "clothing"
+      },
+      {
+        "ID": "0c945995-7c02-4aad-b994-91cf04dfc6e2",
+        "Name": "T-Shirt 12",
+        "Description": "Comfortable and casual t-shirt for everyday wear.",
+        "Stock": 34,
+        "Price": 16.89,
+        "Manufacturer": "Manufacturer 12",
+        "Type": "clothing"
+      },
+      {
+        "ID": "e36726ec-4b87-4d62-a7ed-b3cdfecae75e",
+        "Name": "T-Shirt 13",
+        "Description": "Comfortable and casual t-shirt for everyday wear.",
+        "Stock": 45,
+        "Price": 36.82,
+        "Manufacturer": "Manufacturer 13",
+        "Type": "clothing"
+      },
+      {
+        "ID": "b60a4aa7-572d-4f79-a43f-e5d5a44ecf65",
+        "Name": "T-Shirt 14",
+        "Description": "Comfortable and casual t-shirt for everyday wear.",
+        "Stock": 130,
+        "Price": 63.51,
+        "Manufacturer": "Manufacturer 14",
+        "Type": "clothing"
+      },
+      {
+        "ID": "49f8acd3-3d29-40ea-941c-1d0d7118210a",
+        "Name": "Jacket 15",
+        "Description": "Warm and cozy jacket for the colder months.",
+        "Stock": 34,
+        "Price": 35.83,
+        "Manufacturer": "Manufacturer 15",
+        "Type": "clothing"
+      }
+    ],
+    "books": []
   }
 }

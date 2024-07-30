@@ -2,16 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GLTFast;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 public class ModelImporter : MonoBehaviour
 {
     public FileDownloader Downloader;
     public string DataURL;
+    public string ProductURL;
     private Catelog productTypes = new Catelog();
     private LocalTableData LocalData;
 
@@ -34,7 +37,7 @@ public class ModelImporter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            DownloadCategory("food");
+            DownloadCategory(LocalData.DATA.ElementAt(Random.Range(0,LocalData.DATA.Count)).Key);
         }
     }
 
@@ -98,7 +101,7 @@ public class ModelImporter : MonoBehaviour
 
     private IEnumerator GetCategoryData(string productType)
     {
-        using (UnityWebRequest productRequest = UnityWebRequest.Get(DataURL + $"/{productType}"))
+        using (UnityWebRequest productRequest = UnityWebRequest.Get(ProductURL + $"/{productType}"))
         {
             yield return productRequest.SendWebRequest();
                             
