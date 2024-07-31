@@ -16,7 +16,10 @@ public class ModelImporter : MonoBehaviour
     public string DataURL;
     public string ProductURL;
     private Catelog productTypes = new Catelog();
-    private LocalTableData LocalData;
+    public static LocalTableData LocalData;
+    public GameObject SelectionUI;
+    public GameObject CategoryPrefab;
+    public GameObject ShelfGameObject;
 
     private void Awake()
     {
@@ -29,7 +32,8 @@ public class ModelImporter : MonoBehaviour
         yield return StartCoroutine(FetchCategories());
         foreach (var products in LocalData.DATA)
         {
-            print(products.Key);
+            var option = Instantiate(CategoryPrefab,SelectionUI.transform);
+            option.GetComponent<CategoryButton>().INIT(products.Key);
         }
     }
 
@@ -37,7 +41,7 @@ public class ModelImporter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            DownloadCategory(LocalData.DATA.ElementAt(Random.Range(0,LocalData.DATA.Count)).Key);
+            //DownloadCategory(LocalData.DATA.ElementAt(Random.Range(0,LocalData.DATA.Count)).Key);
         }
     }
 
@@ -87,19 +91,38 @@ public class ModelImporter : MonoBehaviour
         }
     }
 
-    public void DownloadCategory(string category)
+    // public void DownloadCategory(string category)
+    // {
+    //     if (!LocalData.IsCategoryDownloaded(category))
+    //     {
+    //         StartCoroutine(GetCategoryData(category));
+    //     }
+    //     else
+    //     {
+    //         Debug.Log($"Category {category} is already downloaded.");
+    //     }
+    // }
+
+    public IEnumerator DownloadCategoryCoroutine(string category, System.Action onComplete)
     {
         if (!LocalData.IsCategoryDownloaded(category))
         {
-            StartCoroutine(GetCategoryData(category));
+            bool isDownloadComplete = false;
+            StartCoroutine(GetCategoryData(category, () => isDownloadComplete = true));
+
+            while (!isDownloadComplete)
+            {
+                yield return null;
+            }
         }
         else
         {
             Debug.Log($"Category {category} is already downloaded.");
         }
-    }
 
-    private IEnumerator GetCategoryData(string productType)
+        onComplete?.Invoke();
+    }
+    private IEnumerator GetCategoryData(string productType , Action OnComplete)
     {
         using (UnityWebRequest productRequest = UnityWebRequest.Get(ProductURL + $"/{productType}"))
         {
@@ -130,6 +153,8 @@ public class ModelImporter : MonoBehaviour
                 Debug.LogError($"Failed To retrieve Catalog for type: {productType}. Error: {productRequest.error}");
             }
         }
+        
+        OnComplete?.Invoke();
     }
 
     private void SaveLocalData()
@@ -155,7 +180,7 @@ public class ModelImporter : MonoBehaviour
                  Debug.LogError("Failed to load GLB file.");
              }
          }
-         private IEnumerator ImportSingleGLB(string path)
+    private IEnumerator ImportSingleGLB(string path)
          {
              Task importTask = ImportGLB(path);
              
@@ -173,4 +198,90 @@ public class ModelImporter : MonoBehaviour
                  Debug.Log($"Successfully imported {path}");
              }
          }
+    
+    public static async Task<List<GameObject>> CreateGameObjectsFromCategoryAsync(string category)
+    {
+        List<GameObject> categoryObjects = new List<GameObject>();
+        string categoryPath = Path.Combine(Application.dataPath, "Product Models", category);
+
+        Debug.Log($"Category path: {categoryPath}");
+
+        if (!Directory.Exists(categoryPath))
+        {
+            Debug.LogError($"Category directory does not exist: {categoryPath}");
+            return categoryObjects;
+        }
+
+        string[] glbFiles = Directory.GetFiles(categoryPath, "*.glb");
+        Debug.Log($"Found {glbFiles.Length} GLB files in {categoryPath}");
+
+        foreach (string glbFileR in glbFiles)
+        {
+            string glbFile = Path.GetFullPath(glbFileR);
+            Debug.Log($"Loading GLB file: {glbFile}");
+
+            GameObject obj = await LoadGLBAsGameObjectAsync(glbFile);
+
+            if (obj != null)
+            {
+                categoryObjects.Add(obj);
+                Debug.Log($"Added object: {obj.name}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to load GLB file: {glbFile}");
+            }
+        }
+
+        return categoryObjects;
+    }
+
+    private static async Task<GameObject> LoadGLBAsGameObjectAsync(string path)
+    {
+        var gltf = new GLTFast.GltfImport();
+        Debug.Log($"Starting to load: {path}");
+
+        bool loadSuccess = await gltf.Load(path);
+
+        if (loadSuccess)
+        {
+            GameObject newObject = new GameObject(Path.GetFileNameWithoutExtension(path));
+            newObject.SetActive(false);
+            await gltf.InstantiateMainSceneAsync(newObject.transform);
+            StandardizeScale(newObject,1);
+            // newObject.SetActive(true);
+            Debug.Log($"Successfully loaded: {path}");
+            return newObject;
+        }
+        else
+        {
+            Debug.LogError($"Failed to load GLB file: {path}");
+            return null;
+        }
+    }
+    
+    public static void StandardizeScale(GameObject obj, float standardSize)
+    {
+        // Get all renderers in the object and its children
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return;
+
+        // Calculate the bounds of the entire object
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        // Calculate the maximum dimension of the object
+        float maxDimension = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+
+        // Calculate the scale factor
+        float scaleFactor = standardSize / maxDimension;
+
+        // Apply the scale
+        obj.transform.localScale *= scaleFactor;
+
+        Debug.Log($"Standardized scale for {obj.name}. Scale factor: {scaleFactor}");
+    }
 }
