@@ -20,6 +20,7 @@ public class CategoryButton : MonoBehaviour
     public GameObject Cloud;
     public GameObject Downloading;
     public GameObject Run;
+    private ModelImporter Importer;
 
     // [Header("Settings")]
     // public bool DEBUG;
@@ -32,6 +33,7 @@ public class CategoryButton : MonoBehaviour
 
     public void INIT(string cat)
     {
+        Importer = FindObjectOfType<ModelImporter>();
         CATEGORY = cat;
         transform.GetChild(0).GetComponent<TMP_Text>().text = CATEGORY.FirstToUpper();
         Downloding = false;
@@ -126,7 +128,7 @@ public class CategoryButton : MonoBehaviour
             //DistributeObjectsOnShelves(CatelogModels,5,5,5);
             //DistributeObjectsOnShelves(CatelogModels,30,2,1,5);
             
-            DistributeObjectsOnShelves(categoryObjects,20,3,2.5f,14);
+            DistributeObjectsOnShelves(categoryObjects,Importer.ShelfGameObject,Collection.transform,20,3,2.5f,14);
             Collection.transform.position = new Vector3(-20,1.5f,14);
             foreach (var model in CatelogModels)
             {
@@ -152,18 +154,35 @@ public class CategoryButton : MonoBehaviour
         Collection.SetActive(true);
     }
     
-    public void DistributeObjectsOnShelves(List<GameObject> objects, float shelfSpacing = 1.0f, float levelSpacing = 1.0f, float itemSpacing = 0.2f, float columnSpacing = 2.0f)
+    public void DistributeObjectsOnShelves(List<GameObject> objects, GameObject shelfPrefab, Transform parentTransform, float shelfSpacing = 1.0f, float levelSpacing = 1.0f, float itemSpacing = 0.2f, float columnSpacing = 2.0f)
     {
         int levelsPerShelf = 3;
         int itemsPerLevel = 5;
         int columns = 4;
         int itemsPerShelf = levelsPerShelf * itemsPerLevel;
 
+        int lastShelfIndex = -1;
+
         for (int i = 0; i < objects.Count; i++)
         {
             int shelfIndex = i / itemsPerShelf;
             int columnIndex = shelfIndex % columns;
             int rowIndex = shelfIndex / columns;
+
+            // Check if we're starting a new shelf
+            if (shelfIndex != lastShelfIndex)
+            {
+                // Instantiate a new shelf
+                Vector3 shelfPosition = new Vector3(columnIndex * columnSpacing, 0, rowIndex * shelfSpacing);
+                GameObject newShelf = GameObject.Instantiate(shelfPrefab, shelfPosition, Quaternion.identity, parentTransform);
+                newShelf.transform.Rotate(-90,0,0);
+                newShelf.transform.position += new Vector3(0, 6, 0);
+            
+                // You might want to name the shelf for easy identification
+                newShelf.name = $"Shelf_{shelfIndex}";
+
+                lastShelfIndex = shelfIndex;
+            }
 
             int itemIndexInShelf = i % itemsPerShelf;
             int levelIndex = itemIndexInShelf / itemsPerLevel;
@@ -175,5 +194,4 @@ public class CategoryButton : MonoBehaviour
 
             objects[i].transform.position = new Vector3(x, y, z);
         }
-    }
-}
+    }}
