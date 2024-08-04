@@ -248,7 +248,7 @@ public class ModelImporter : MonoBehaviour
             GameObject newObject = new GameObject(Path.GetFileNameWithoutExtension(path));
             newObject.SetActive(false);
             await gltf.InstantiateMainSceneAsync(newObject.transform);
-            StandardizeScale(newObject,1);
+            StandardizeScale(newObject,0.5f);
             // newObject.SetActive(true);
             Debug.Log($"Successfully loaded: {path}");
             return newObject;

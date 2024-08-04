@@ -122,6 +122,9 @@ public class CategoryButton : MonoBehaviour
             {
                 CatelogModels.Add(obj); 
                 obj.transform.SetParent(Collection.transform);
+                obj.AddComponent<Rigidbody>().isKinematic = true;
+                ProductInteractablle.AddSphereColliderToFirstMeshRenderer(obj);
+               
                 // obj.SetActive(true);
             }
             
@@ -133,6 +136,8 @@ public class CategoryButton : MonoBehaviour
             foreach (var model in CatelogModels)
             {
                 model.SetActive(true);
+                model.AddComponent<ProductInteractablle>().Initialize();
+                
             }
         }
         else
