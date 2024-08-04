@@ -1,81 +1,107 @@
-using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using System.Collections;
+using Newtonsoft.Json;
 
-public class ProductInteractablle : XRGrabInteractable
+public class ProductInteractable : XRGrabInteractable
 {
-    Outline outline;
-    SphereCollider sphereCollider;
-    Vector3 InitialPosition;
-    Quaternion InitialRotation;
-    public bool MoveBack;
+    private Outline outline;
+    private SphereCollider sphereCollider;
+    private Vector3 initialPosition;
+    private Quaternion initialRotation;
+    private bool moveBack;
+    private bool viewingID;
+    private bool isResetting;
+    private GameObject card;
+    private Vector3 originalScale;
+    private Vector3 shrunkScale;
+
+    public GameObject ID_Card;
+    public float outlineWidth = 6.0f;
+    public Color outlineColor = Color.cyan;
+    public float shrinkFactor = 0.3f;
+    public float transitionSpeed = 0.1f;
+    public float resetDuration = 1f;
+
     public void Initialize()
     {
-            
+        SetupComponents();
+        SetupInitialTransform();
+        SetupCard();
+        SetupScales();
+    }
+
+    private void SetupComponents()
+    {
         sphereCollider = GetComponent<SphereCollider>();
-
-
         outline = gameObject.AddComponent<Outline>();
-        outline.OutlineWidth = 6.0f;
-        outline.OutlineColor = Color.cyan;
+        outline.OutlineWidth = outlineWidth;
+        outline.OutlineColor = outlineColor;
         outline.enabled = false;
+    }
 
-        InitialPosition = transform.position;
-        InitialRotation = transform.rotation;
-        MoveBack = false;
-
+    private void SetupInitialTransform()
+    {
+        initialPosition = transform.position;
+        initialRotation = transform.rotation;
+        moveBack = false;
         useDynamicAttach = true;
-      }
-    void Update()
+    }
+
+    private void SetupCard()
     {
-        if (MoveBack)
+        card = Instantiate(ModelImporter.UI_CardPrefab, transform);
+        ModelImporter.FixUIScale(card);
+        card.GetComponent<RectTransform>().Translate(0, 0.1f, 0);
+        card.SetActive(false);
+
+        var Positioner = card.GetComponent<CardPositioner>();
+        print(JsonConvert.SerializeObject(ModelImporter.LocalData));
+        ProductDisplay info = ModelImporter.LocalData.GetInformation(gameObject.name);
+        Positioner.Title.text = info.Name;
+        Positioner.Description.text = info.Description;
+        Positioner.Price.text = $"${info.Price}<sub>[{info.Stock}]</sub>";
+        Positioner.Manufacturer.text = info.Manufacturer;
+
+    }
+
+    private void SetupScales()
+    {
+        originalScale = transform.GetChild(0).localScale;
+        shrunkScale = originalScale * shrinkFactor;
+    }
+
+    private void Update()
+    {
+        if (moveBack)
         {
-            transform.position = Vector3.Lerp(transform.position, InitialPosition, 0.025f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, InitialRotation, 0.05f);
-            if (Vector3.Distance(transform.position, InitialPosition) < 0.01f &&Quaternion.Angle(transform.rotation, InitialRotation) < 0.1f)
-            {
-                transform.position = InitialPosition;
-                transform.rotation = InitialRotation;
-                print("Reset");
-                MoveBack = false;
-            }
+            MoveBackToInitialPosition();
         }
     }
 
-    private static MeshRenderer FindFirstMeshRenderer(GameObject root)
+    private void MoveBackToInitialPosition()
     {
-        MeshRenderer meshRenderer = root.GetComponent<MeshRenderer>();
-        if (meshRenderer != null)
+        if (viewingID && !isResetting)
         {
-            return meshRenderer;
+            StartCoroutine(ResetObjectWrapper());
         }
 
-        foreach (Transform child in root.transform)
-        {
-            meshRenderer = FindFirstMeshRenderer(child.gameObject);
-            if (meshRenderer != null)
-            {
-                return meshRenderer;
-            }
-        }
+        transform.position = Vector3.Lerp(transform.position, initialPosition, transitionSpeed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, initialRotation, transitionSpeed * 2);
 
-        return null;
+        if (Vector3.Distance(transform.position, initialPosition) < 0.01f &&
+            Quaternion.Angle(transform.rotation, initialRotation) < 0.1f)
+        {
+            CompleteReset();
+        }
     }
 
-    public static SphereCollider AddSphereColliderToFirstMeshRenderer(GameObject root)
+    private void CompleteReset()
     {
-        if (root == null)
-        {
-            return null;
-        }
-
-        MeshRenderer meshRenderer = FindFirstMeshRenderer(root);
-
-        if (meshRenderer != null)
-        {
-            SphereCollider sphereCollider = meshRenderer.gameObject.AddComponent<SphereCollider>();
-            return sphereCollider;
-        }
-        return null;
+        transform.position = initialPosition;
+        transform.rotation = initialRotation;
+        Debug.Log("Reset complete");
+        moveBack = false;
     }
 
     protected override void OnHoverEntered(HoverEnterEventArgs args)
@@ -90,24 +116,87 @@ public class ProductInteractablle : XRGrabInteractable
         outline.enabled = false;
     }
 
-    protected override void OnSelectEntered(SelectEnterEventArgs args)
-    {
-        base.OnSelectEntered(args);
-    }
-
     protected override void OnSelectExited(SelectExitEventArgs args)
     {
         base.OnSelectExited(args);
-        MoveBack = true;
+        moveBack = true;
     }
 
     protected override void OnActivated(ActivateEventArgs args)
     {
         base.OnActivated(args);
+        viewingID = !viewingID;
+        StartCoroutine(viewingID ? ShrinkObject() : EnlargeObject());
     }
 
-    protected override void OnDeactivated(DeactivateEventArgs args)
+    private IEnumerator ShrinkObject()
     {
-        base.OnDeactivated(args);
+        yield return ScaleObject(shrunkScale);
+        card.SetActive(true);
+    }
+
+    private IEnumerator EnlargeObject()
+    {
+        card.SetActive(false);
+        yield return ScaleObject(originalScale);
+    }
+
+    private IEnumerator ScaleObject(Vector3 targetScale)
+    {
+        Transform model = transform.GetChild(0);
+        while (Vector3.Distance(model.localScale, targetScale) > 0.01f)
+        {
+            model.localScale = Vector3.Lerp(model.localScale, targetScale, transitionSpeed);
+            yield return null;
+        }
+        model.localScale = targetScale;
+    }
+
+    private IEnumerator ResetObjectWrapper()
+    {
+        isResetting = true;
+        card.SetActive(false);
+        yield return ResetObject();
+        isResetting = false;
+    }
+
+    private IEnumerator ResetObject()
+    {
+        Transform model = transform.GetChild(0);
+        float elapsedTime = 0f;
+        Vector3 startScale = model.localScale;
+
+        while (elapsedTime < resetDuration)
+        {
+            model.localScale = Vector3.Lerp(startScale, originalScale, elapsedTime / resetDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        model.localScale = originalScale;
+        card.SetActive(false);
+        viewingID = false;
+    }
+
+    public static SphereCollider AddSphereColliderToFirstMeshRenderer(GameObject root)
+    {
+        if (root == null) return null;
+
+        MeshRenderer meshRenderer = FindFirstMeshRenderer(root);
+        return meshRenderer != null ? meshRenderer.gameObject.AddComponent<SphereCollider>() : null;
+    }
+
+    private static MeshRenderer FindFirstMeshRenderer(GameObject root)
+    {
+        MeshRenderer meshRenderer = root.GetComponent<MeshRenderer>();
+        if (meshRenderer != null) return meshRenderer;
+
+        foreach (Transform child in root.transform)
+        {
+            meshRenderer = FindFirstMeshRenderer(child.gameObject);
+            if (meshRenderer != null) return meshRenderer;
+        }
+
+        return null;
     }
 }

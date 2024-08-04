@@ -20,10 +20,13 @@ public class ModelImporter : MonoBehaviour
     public GameObject SelectionUI;
     public GameObject CategoryPrefab;
     public GameObject ShelfGameObject;
+    public GameObject UI_Description_Prefab;
+    public static GameObject UI_CardPrefab;
 
     private void Awake()
     {
         Downloader = GetComponent<FileDownloader>();
+        UI_CardPrefab = UI_Description_Prefab;
     }
 
     private IEnumerator Start()
@@ -90,18 +93,31 @@ public class ModelImporter : MonoBehaviour
             }
         }
     }
+    public static void FixUIScale(GameObject uiPrefab)
+    {
+        // Ensure the UI prefab has a Canvas component
+        Canvas canvas = uiPrefab.GetComponentInChildren<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogError("The provided GameObject does not have a Canvas component.");
+            return;
+        }
 
-    // public void DownloadCategory(string category)
-    // {
-    //     if (!LocalData.IsCategoryDownloaded(category))
-    //     {
-    //         StartCoroutine(GetCategoryData(category));
-    //     }
-    //     else
-    //     {
-    //         Debug.Log($"Category {category} is already downloaded.");
-    //     }
-    // }
+        // Get the parent object's scale
+        Transform parentTransform = uiPrefab.transform.parent;
+        if (parentTransform == null)
+        {
+            Debug.LogError("The provided GameObject does not have a parent.");
+            return;
+        }
+
+        // Calculate the inverse scale to maintain a consistent size
+        Vector3 parentScale = parentTransform.localScale;
+        Vector3 inverseScale = new Vector3(1 / parentScale.x, 1 / parentScale.y, 1 / parentScale.z);
+
+        // Set the local scale of the UI prefab to the inverse scale
+        uiPrefab.transform.localScale = inverseScale/400;
+    }
 
     public IEnumerator DownloadCategoryCoroutine(string category, System.Action onComplete)
     {
@@ -109,7 +125,7 @@ public class ModelImporter : MonoBehaviour
         {
             bool isDownloadComplete = false;
             StartCoroutine(GetCategoryData(category, () => isDownloadComplete = true));
-
+            SaveLocalData();
             while (!isDownloadComplete)
             {
                 yield return null;
@@ -139,6 +155,7 @@ public class ModelImporter : MonoBehaviour
                         yield return StartCoroutine(Downloader.DownloadFile(product.meshURL, $"Model_{product._id}.glb", productType));
                         if (File.Exists(Path.Combine(Application.dataPath, "Product Models", productType, $"Model_{product._id}.glb")))
                         {
+                            //print($"Adding ")
                             LocalData.AddProduct(product);
                         }
                         Debug.Log($"Downloaded Model {product._id}!");
@@ -157,12 +174,29 @@ public class ModelImporter : MonoBehaviour
         OnComplete?.Invoke();
     }
 
-    private void SaveLocalData()
+public void SaveLocalData()
+{
+    try
     {
         string json = JsonConvert.SerializeObject(LocalData, Formatting.Indented);
-        File.WriteAllText(Path.Combine(Application.dataPath, "Product Models", "data.json"), json);
-        print("Saved Data locally");
+        string filePath = Path.Combine(Application.dataPath, "Product Models", "data.json");
+        File.WriteAllText(filePath, json);
+        Debug.Log($"Saved Data locally to {filePath}");
+
+        // Verify saved data
+        string savedJson = File.ReadAllText(filePath);
+        LocalTableData loadedData = JsonConvert.DeserializeObject<LocalTableData>(savedJson);
+        Debug.Log($"Loaded data contains {loadedData.DATA.Count} categories");
+        foreach (var category in loadedData.DATA)
+        {
+            Debug.Log($"Category: {category.Key}, Products: {category.Value.Count}");
+        }
     }
+    catch (Exception e)
+    {
+        Debug.LogError($"Error saving local data: {e.Message}");
+    }
+}
 
     async Task ImportGLB(string path)
          {

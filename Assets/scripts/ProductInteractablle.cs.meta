@@ -3,7 +3,13 @@ guid: 4029edfb02cd26b47ba57fb8860ef374
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_InteractionManager: {instanceID: 0}
+  - m_CustomReticle: {instanceID: 0}
+  - m_AttachTransform: {instanceID: 0}
+  - m_SecondaryAttachTransform: {instanceID: 0}
+  - ID_Card: {fileID: 1035381719466519385, guid: 5cef88eb415f88f43b1545e32ca4e0c6,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

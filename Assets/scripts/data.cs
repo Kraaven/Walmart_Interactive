@@ -1,3 +1,5 @@
+using GLTFast.Schema;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +33,7 @@ public class Catelog
     public int status;
 }
 
+[Serializable]
 public class LocalTableData
 {
     public Dictionary<string, List<ProductDisplay>> DATA = new Dictionary<string, List<ProductDisplay>>();
@@ -61,6 +64,22 @@ public class LocalTableData
         DATA[info.category].Add(piece);
 
     }
+    public ProductDisplay GetInformation(string id)
+    {
+        foreach (var category in DATA.Values)
+        {
+            foreach (var item in category)
+            {
+                if (id.Equals($"Model_{item.ID}"))
+                {
+                    Debug.Log("Information Exists");
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public void AddCategory(string TYPE)
     {

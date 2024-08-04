@@ -7171,6 +7171,8 @@ MonoBehaviour:
     type: 3}
   ShelfGameObject: {fileID: 2672075066468909777, guid: edf5896bc8583c74a949d7eb5cd96b5f,
     type: 3}
+  UI_Description_Prefab: {fileID: 1035381719466519385, guid: 5cef88eb415f88f43b1545e32ca4e0c6,
+    type: 3}
 --- !u!4 &1890481759
 Transform:
   m_ObjectHideFlags: 0
